@@ -21,21 +21,16 @@ body {
   position: fixed;
   inset: 0;
   margin: auto;
-
   width: 150px;
   height: 150px;
-
   border-radius: 50%;
   border: none;
-
   background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
   color: white;
-
-  font-size: 16px;
   font-weight: bold;
 }
 
-/* LOADING */
+/* BOOT */
 #loading {
   position: fixed;
   inset: 0;
@@ -49,7 +44,7 @@ body {
 #logs {
   margin-top: 20px;
   font-size: 14px;
-  opacity: 0.8;
+  opacity: 0.85;
   text-align: center;
 }
 
@@ -76,25 +71,37 @@ body {
   z-index: 10;
 }
 
-/* EFEITOS DE ERRO */
+/* GLITCH */
 .shake {
-  animation: shake 0.1s infinite;
+  animation: shake 0.08s infinite;
 }
 
 @keyframes shake {
-  0% { transform: translate(2px, 2px); }
-  50% { transform: translate(-2px, -2px); }
-  100% { transform: translate(2px, 2px); }
+  0% { transform: translate(2px,2px); }
+  50% { transform: translate(-2px,-2px); }
+  100% { transform: translate(2px,2px); }
 }
 
 .corrupt {
-  animation: corrupt 0.08s infinite;
+  animation: corrupt 0.06s infinite;
 }
 
 @keyframes corrupt {
   0% { filter: hue-rotate(0deg) contrast(1); }
-  50% { filter: hue-rotate(120deg) contrast(1.4); }
+  50% { filter: hue-rotate(140deg) contrast(1.5); }
   100% { filter: hue-rotate(0deg) contrast(1); }
+}
+
+/* 💥 VIDRO RACHADO OVERLAY */
+#crack {
+  position: fixed;
+  inset: 0;
+  background: url("https://i.imgur.com/3g7nmJC.png") center/cover no-repeat;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.4s;
+  mix-blend-mode: screen;
+  z-index: 5;
 }
 
 /* FINAL */
@@ -113,16 +120,10 @@ video {
   width: 95%;
   max-width: 500px;
   border-radius: 12px;
-
   opacity: 0;
   transform: scale(0.8);
   transition: 0.6s ease;
-
   object-fit: cover;
-
-  /* 🔥 GARANTIA: nunca herdar glitch */
-  animation: none !important;
-  filter: none !important;
 }
 
 /* SENHA */
@@ -132,7 +133,6 @@ video {
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 14px;
   padding: 18px 28px;
-
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s ease;
@@ -152,6 +152,8 @@ video {
 <div id="notif">⚠ System<br>Network anomaly detected</div>
 <div id="popup"></div>
 
+<div id="crack"></div>
+
 <div id="loading">
   <div id="logs"></div>
 </div>
@@ -169,17 +171,23 @@ video {
 
 </div>
 
+<!-- SIRENE -->
 <audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
+
+<!-- BEEPS BOOT -->
+<audio id="beep1" src="https://www.soundjay.com/button/sounds/button-09.mp3"></audio>
+<audio id="beep2" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+<audio id="beep3" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
 
 <script>
 
 const logs = [
-  "Acessando rede...",
-  "Verificando conexão...",
-  "Sincronizando servidores...",
-  "Injetando protocolo...",
-  "Detectando falhas...",
-  "Sistema instável..."
+  "Iniciando kernel...",
+  "Carregando módulos...",
+  "Bypass de segurança...",
+  "Escaneando rede local...",
+  "Injeção de pacote suspeito...",
+  "SISTEMA COMPROMETIDO"
 ];
 
 let i = 0;
@@ -187,10 +195,25 @@ let i = 0;
 document.getElementById("startBtn").onclick = () => {
   document.getElementById("startBtn").remove();
   document.getElementById("loading").style.display = "flex";
-  loop();
+
+  bootLoop();
 };
 
-function loop() {
+/* 🔊 SOM SINCRONIZADO POR LINHA */
+function playSound(index) {
+  const sounds = [
+    document.getElementById("beep1"),
+    document.getElementById("beep2"),
+    document.getElementById("beep3")
+  ];
+
+  let s = sounds[index % sounds.length];
+  s.currentTime = 0;
+  s.play().catch(()=>{});
+}
+
+/* BOOT */
+function bootLoop() {
 
   if (i < logs.length) {
 
@@ -198,69 +221,70 @@ function loop() {
     p.innerText = logs[i];
     document.getElementById("logs").appendChild(p);
 
+    playSound(i); // 🔊 sincronizado
+
     i++;
 
-    setTimeout(loop, 900 + Math.random() * 800);
+    setTimeout(bootLoop, 800 + Math.random()*600);
 
   } else {
-    setTimeout(erro, 1000);
+    setTimeout(erro, 800);
   }
 }
 
+/* 💀 ERRO + CORRUPÇÃO */
 function erro() {
 
   document.getElementById("notif").style.top = "0";
   document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML =
-    "<b>SYSTEM CORRUPTION DETECTED</b>";
+  document.getElementById("popup").innerHTML = "<b>SYSTEM BREACH DETECTED</b>";
 
   document.body.classList.add("shake", "corrupt");
 
-  // 🔊 SIRENE
+  // 💥 vidro rachando
+  const crack = document.getElementById("crack");
+  crack.style.opacity = "1";
+
+  // 🔊 sirene
   const s = document.getElementById("sirene");
   s.currentTime = 0;
   s.play().catch(()=>{});
 
   // 📳 vibração
   if (navigator.vibrate) {
-    navigator.vibrate([200,100,300,100,500,100,600]);
+    navigator.vibrate([200,100,300,100,500,200,600]);
   }
 
   setTimeout(iniciarVideo, 2500);
 }
 
+/* 🎬 VÍDEO */
 function iniciarVideo() {
 
-  // 🚨 REMOVE TODOS OS EFEITOS (CORREÇÃO PRINCIPAL)
-  document.body.classList.remove("shake", "corrupt");
+  document.body.classList.remove("shake","corrupt");
 
   document.getElementById("loading").remove();
   document.getElementById("notif").remove();
   document.getElementById("popup").remove();
+  document.getElementById("crack").remove();
 
   const video = document.getElementById("video");
   const final = document.getElementById("final");
 
   final.style.display = "flex";
 
-  // estado limpo garantido
-  video.style.opacity = "1";
-  video.style.transform = "scale(1)";
-
-  video.play().catch(()=>{});
-
-  let acabou = false;
-
-  video.onended = () => {
-    acabou = true;
-    mostrarSenha();
-  };
-
   setTimeout(() => {
-    if (!acabou) mostrarSenha();
-  }, 20000);
+    video.style.opacity = "1";
+    video.style.transform = "scale(1)";
+    video.play().catch(()=>{});
+  }, 200);
+
+  video.onended = mostrarSenha;
+
+  setTimeout(mostrarSenha, 20000);
 }
 
+/* 🔑 SENHA */
 function mostrarSenha() {
 
   document.getElementById("video").style.display = "none";
