@@ -60,6 +60,7 @@ body {
   padding: 14px;
   font-size: 13px;
   transition: top 0.6s ease;
+  z-index: 10;
 }
 
 /* POPUP */
@@ -71,6 +72,7 @@ body {
   padding: 18px;
   border-top: 3px solid red;
   transition: bottom 0.6s ease;
+  z-index: 10;
 }
 
 /* SHAKE */
@@ -97,17 +99,23 @@ body {
   100% { filter: hue-rotate(0deg); }
 }
 
-/* FINAL */
+/* FINAL CENTRALIZADO */
 #final {
   display: none;
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  padding: 15px;
 }
 
 /* VIDEO */
 video {
-  width: 100%;
+  width: 90%;
   max-width: 420px;
+  border-radius: 12px;
   transform: scale(0.6);
   opacity: 0;
   transition: all 0.8s ease;
@@ -119,9 +127,9 @@ video {
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 14px;
-  padding: 18px;
-  display: inline-block;
+  padding: 18px 28px;
   backdrop-filter: blur(8px);
+
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s ease;
@@ -161,7 +169,7 @@ Network anomaly detected
 <!-- FINAL -->
 <div id="final">
 
-  <video id="video" autoplay muted playsinline preload="auto">
+  <video id="video" playsinline preload="auto">
     <source src="0416.mp4" type="video/mp4">
   </video>
 
@@ -202,7 +210,7 @@ function loop() {
 
     i++;
 
-    let delay = 900 + Math.random() * 1400; // realista
+    let delay = 900 + Math.random() * 1400;
     setTimeout(loop, delay);
 
   } else {
@@ -214,12 +222,6 @@ function erro() {
 
   document.getElementById("notif").style.top = "0";
   document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML =
-    "<b>Instabilidade detectada</b><br>Tentando recuperar conexão...";
-
-  if (navigator.vibrate) {
-    navigator.vibrate([120,80,200,80,300]);
-  }
 
   document.body.classList.add("shake");
 
@@ -235,44 +237,24 @@ function travar() {
   document.getElementById("loading").style.display = "none";
   document.getElementById("popup").style.display = "none";
 
-  let freeze = document.createElement("div");
-  freeze.style.position = "fixed";
-  freeze.style.bottom = "0";
-  freeze.style.width = "100%";
-  freeze.style.background = "#222";
-  freeze.style.padding = "20px";
-  freeze.style.borderTop = "2px solid red";
-  freeze.innerHTML = "<b>O sistema não está respondendo...</b>";
+  const final = document.getElementById("final");
+  final.style.display = "flex";
 
-  document.body.appendChild(freeze);
+  const video = document.getElementById("video");
 
-  setTimeout(() => {
-    mostrarFinal(freeze);
-  }, 2600);
-}
+  video.style.transform = "scale(1)";
+  video.style.opacity = "1";
 
-function mostrarFinal(freeze) {
+  video.play().catch(() => {
+    video.muted = true;
+    video.play();
+  });
 
-  freeze.remove();
-
-  document.body.classList.remove("shake");
-  document.body.classList.remove("glitch");
-
-  let final = document.getElementById("final");
-  final.style.display = "block";
-
-  let video = document.getElementById("video");
-
-  setTimeout(() => {
-    video.style.transform = "scale(1)";
-    video.style.opacity = "1";
-    video.play().catch(()=>{});
-  }, 500);
-
-  setTimeout(() => {
+  // 🔥 SENHA SÓ APARECE QUANDO O VÍDEO TERMINA
+  video.onended = () => {
     document.getElementById("senhaBox").style.opacity = "1";
     document.getElementById("senhaBox").style.transform = "translateY(0)";
-  }, 2800);
+  };
 }
 
 iniciar();
