@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>System Status</title>
+<title>System Access</title>
 
 <style>
 body {
   margin: 0;
+  font-family: Arial, sans-serif;
   background: black;
   color: white;
-  font-family: Arial;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -20,8 +21,8 @@ body {
   position: fixed;
   inset: 0;
   margin: auto;
-  width: 160px;
-  height: 160px;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
   border: none;
   background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
@@ -41,33 +42,75 @@ body {
 
 /* LOGS */
 #logs {
-  text-align: center;
+  margin-top: 20px;
   font-size: 14px;
   opacity: 0.85;
+  text-align: center;
 }
 
-/* ALERTA */
+/* 🔥 NOTIF TOPO */
 #notif {
   position: fixed;
   top: -120px;
   width: 100%;
   background: #111;
-  padding: 12px;
-  transition: 0.4s;
-  border-bottom: 1px solid red;
+  padding: 14px;
+  transition: top 0.4s;
+  z-index: 10;
+  text-align: center;
+  border-bottom: 2px solid #ff3b3b;
 }
 
+/* 💥 POPUP CENTRAL (AJUSTADO) */
 #popup {
   position: fixed;
-  bottom: -200px;
-  width: 100%;
-  background: #1a1a1a;
-  padding: 18px;
-  border-top: 2px solid red;
-  transition: 0.4s;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 85%;
+  max-width: 420px;
+
+  background: rgba(255, 204, 0, 0.12);
+  border: 1px solid rgba(255, 204, 0, 0.8);
+  color: #ffd54a;
+
+  padding: 16px;
+  border-radius: 12px;
+
+  text-align: center;
+  font-weight: bold;
+
+  box-shadow: 0 0 25px rgba(255, 204, 0, 0.25);
+
+  z-index: 50;
 }
 
-/* CAOS VISUAL */
+/* 🔥 ALERTAS FLUTUANTES */
+.floatingAlert {
+  position: fixed;
+  width: 220px;
+  padding: 10px;
+
+  background: rgba(255, 204, 0, 0.10);
+  border: 1px solid rgba(255, 204, 0, 0.6);
+  color: #ffd54a;
+
+  font-size: 12px;
+  border-radius: 10px;
+
+  z-index: 40;
+  animation: floatShake 1.4s infinite;
+}
+
+@keyframes floatShake {
+  0% { transform: translate(0,0); }
+  25% { transform: translate(2px,-2px); }
+  50% { transform: translate(-2px,2px); }
+  75% { transform: translate(2px,2px); }
+  100% { transform: translate(0,0); }
+}
+
+/* GLITCH */
 .shake {
   animation: shake 0.08s infinite;
 }
@@ -78,62 +121,54 @@ body {
   100% { transform: translate(2px,2px); }
 }
 
-.glitch {
-  animation: glitch 0.1s infinite;
+.corrupt {
+  animation: corrupt 0.06s infinite;
 }
 
-@keyframes glitch {
+@keyframes corrupt {
   0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(120deg) contrast(1.4); }
+  50% { filter: hue-rotate(140deg) contrast(1.4); }
   100% { filter: hue-rotate(0deg); }
 }
 
-/* VIDEO */
-#videoBox {
+/* FINAL */
+#final {
+  display: none;
   position: fixed;
   inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  background: black;
-}
-
-video {
-  width: 100vw;
-  height: 100vh;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 0.6s ease;
-}
-
-/* SENHA */
-#senhaBox {
-  position: fixed;
-  inset: 0;
-  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-.card {
-  background: rgba(255,255,255,0.08);
-  padding: 20px;
+/* VIDEO (MANTIDO PERFEITO) */
+video {
+  width: 95%;
+  max-width: 500px;
   border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: 0.6s ease;
+  object-fit: cover;
+}
+
+/* SENHA */
+#senhaBox {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 18px 28px;
+
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
 }
 
 .senha {
   font-size: 34px;
-  margin: 10px 0;
-}
-
-button {
-  margin-top: 10px;
-  padding: 10px 14px;
-  background: transparent;
-  border: 1px solid white;
-  color: white;
+  font-weight: bold;
 }
 </style>
 </head>
@@ -142,25 +177,24 @@ button {
 
 <button id="startBtn">CONECTAR</button>
 
-<div id="notif">⚠ System Alert</div>
+<div id="notif">⚠ SYSTEM ALERT</div>
 <div id="popup"></div>
 
 <div id="loading">
   <div id="logs"></div>
 </div>
 
-<div id="videoBox">
-  <video id="video" playsinline>
+<div id="final">
+
+  <video id="video" playsinline preload="auto">
     <source src="0416.mp4" type="video/mp4">
   </video>
-</div>
 
-<div id="senhaBox">
-  <div class="card">
-    <div>🔑 ACCESS KEY</div>
-    <div class="senha" id="senha">mauricio$2018</div>
-    <button onclick="copiar()">COPIAR SENHA</button>
+  <div id="senhaBox">
+    <div>🔑 Acesso Wi-Fi</div>
+    <div class="senha">mauricio$2018</div>
   </div>
+
 </div>
 
 <audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
@@ -168,15 +202,17 @@ button {
 <script>
 
 const logs = [
-  "Initializing system...",
-  "Checking network...",
-  "Verifying security...",
-  "Connection unstable...",
-  "System anomaly detected..."
+  "Connecting to Wi-Fi network...",
+  "Obtaining IP address...",
+  "Authenticating device...",
+  "Checking signal stability...",
+  "Syncing connection...",
+  "Network instability detected"
 ];
 
 let i = 0;
 
+/* START */
 document.getElementById("startBtn").onclick = () => {
   document.getElementById("startBtn").remove();
   document.getElementById("loading").style.display = "flex";
@@ -200,21 +236,21 @@ function loop() {
   }
 }
 
-/* CAOS CONTROLADO */
+/* 💥 CAOS CONTROLADO */
 function failureSequence() {
 
   document.getElementById("notif").style.top = "0";
 
-  document.body.classList.add("shake","glitch");
+  document.body.classList.add("shake","corrupt");
 
   const popup = document.getElementById("popup");
 
   const msgs = [
-    "WARNING: system instability",
-    "critical process failure",
-    "security breach detected",
-    "network corruption increasing",
-    "emergency shutdown initiated"
+    "NETWORK INSTABILITY DETECTED",
+    "UNAUTHORIZED TRAFFIC INBOUND",
+    "SECURITY LAYER COMPROMISED",
+    "PACKET LOSS CRITICAL",
+    "SYSTEM FAILURE IMMINENT"
   ];
 
   let j = 0;
@@ -228,57 +264,69 @@ function failureSequence() {
     }
 
     popup.innerHTML = msgs[j];
-    popup.style.bottom = "0";
 
     if (navigator.vibrate) {
-      navigator.vibrate(100 + j * 50);
+      navigator.vibrate(80 + j * 60);
     }
 
     if (j === 2) {
       document.getElementById("sirene").play().catch(()=>{});
     }
 
+    createFloatingAlert(msgs[j]);
+
     j++;
 
-  }, 1500);
+  }, 1700);
 }
 
-/* VIDEO */
+/* 🔥 ALERTAS FLUTUANTES */
+function createFloatingAlert(text) {
+
+  const div = document.createElement("div");
+  div.className = "floatingAlert";
+
+  div.innerText = text;
+
+  div.style.top = Math.random() * 80 + "%";
+  div.style.left = Math.random() * 70 + "%";
+
+  document.body.appendChild(div);
+
+  setTimeout(() => div.remove(), 4000);
+}
+
+/* 🎬 VÍDEO (NÃO ALTERADO NO LAYOUT) */
 function playVideo() {
 
   document.getElementById("loading").remove();
   document.getElementById("notif").remove();
   document.getElementById("popup").remove();
 
-  document.body.classList.remove("shake","glitch");
+  document.body.classList.remove("shake","corrupt");
 
-  const box = document.getElementById("videoBox");
+  const box = document.getElementById("final");
   const video = document.getElementById("video");
 
   box.style.display = "flex";
 
   requestAnimationFrame(() => {
     video.style.opacity = "1";
+    video.style.transform = "scale(1)";
     video.play().catch(()=>{});
   });
 
   video.onended = showSenha;
-
   setTimeout(showSenha, 20000);
 }
 
-/* SENHA */
+/* 🔑 SENHA */
 function showSenha() {
-
-  document.getElementById("videoBox").remove();
+  document.getElementById("video").style.display = "none";
 
   const box = document.getElementById("senhaBox");
-  box.style.display = "flex";
-}
-
-function copiar() {
-  navigator.clipboard.writeText(document.getElementById("senha").innerText);
-  alert("Senha copiada!");
+  box.style.opacity = "1";
+  box.style.transform = "translateY(0)";
 }
 
 </script>
