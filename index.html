@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>System Status</title>
 
 <style>
@@ -38,7 +39,7 @@ body {
   align-items: center;
 }
 
-/* LOGS (fase conexão) */
+/* LOGS */
 #logs {
   text-align: center;
   font-size: 14px;
@@ -56,54 +57,12 @@ body {
   border-bottom: 1px solid red;
 }
 
-/* FUNDO CAOS */
+/* OVERLAY */
 #overlay {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 5;
-}
-
-/* POPUPS CENTRALIZADOS */
-.popup {
-  position: fixed;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(20,20,20,0.95);
-  border: 1px solid red;
-  padding: 16px 22px;
-  min-width: 260px;
-  text-align: center;
-  font-size: 14px;
-  box-shadow: 0 0 20px rgba(255,0,0,0.3);
-  animation: pop 0.15s ease;
-}
-
-@keyframes pop {
-  from { transform: translate(-50%, -50%) scale(0.7); opacity: 0; }
-  to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-}
-
-/* GLITCH */
-.shake {
-  animation: shake 0.08s infinite;
-}
-
-@keyframes shake {
-  0% { transform: translate(2px,2px); }
-  50% { transform: translate(-2px,-2px); }
-  100% { transform: translate(2px,2px); }
-}
-
-.glitch {
-  animation: glitch 0.1s infinite;
-}
-
-@keyframes glitch {
-  0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(120deg) contrast(1.4); }
-  100% { filter: hue-rotate(0deg); }
 }
 
 /* VIDEO */
@@ -151,6 +110,12 @@ button {
   background: transparent;
   border: 1px solid white;
   color: white;
+}
+
+/* animação leve */
+@keyframes pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 </style>
 </head>
@@ -201,7 +166,7 @@ document.getElementById("startBtn").onclick = () => {
   loop();
 };
 
-/* FASE 1 - CONEXÃO */
+/* BOOT */
 function loop() {
   if (i < logs.length) {
 
@@ -213,50 +178,98 @@ function loop() {
     setTimeout(loop, 1200);
 
   } else {
-    setTimeout(startChaos, 1200);
+    setTimeout(startChaos, 900);
   }
 }
 
-/* FASE 2 - CAOS CENTRALIZADO */
+/* 🔥 ERROS REFEITOS (REALISTA + TERMINAL + CASCATA) */
 function startChaos() {
 
-  // REMOVE LOGS VISUAIS COMPLETAMENTE
   document.getElementById("loading").remove();
-
   document.getElementById("notif").style.top = "0";
-  document.body.classList.add("shake", "glitch");
+  document.body.classList.add("glitch");
 
   const overlay = document.getElementById("overlay");
 
   const msgs = [
-    "SYSTEM BREACH DETECTED",
-    "BANK TRANSFER INTERRUPTED (BRADESCO)",
-    "DATA PACKET CORRUPTION",
-    "UNAUTHORIZED ACCESS",
-    "DEVICE SECURITY FAIL"
+    "net::conn reset 10.0.0.12",
+    "auth token expired (session 4f91)",
+    "packet loss 18% wlan0",
+    "sync retry failed /api/v3",
+    "process halted: file_lock_error",
+    "PIX transfer queued BRADESCO",
+    "transfer aborted user GABRIEL M.S. ****",
+    "encrypted vault access denied",
+    "db rollback #88391",
+    "session hijack attempt blocked",
+    "dns unstable srv br-prod-02",
+    "background service restart loop",
+    "TLS handshake interrupted",
+    "cache desync retry",
+    "PIX revalidation timeout",
+    "file stream corrupted /secure/****",
+    "routing mismatch eth0/wlan0",
+    "banking API partial response"
   ];
 
   let j = 0;
 
-  const interval = setInterval(() => {
+  function spawn() {
 
     if (j >= msgs.length) {
-      clearInterval(interval);
-      setTimeout(startVideo, 2000);
+      setTimeout(() => {
+        overlay.innerHTML = "";
+        startVideo();
+      }, 1200);
       return;
     }
 
-    // cria popup central (empilhado levemente aleatório)
-    let div = document.createElement("div");
-    div.className = "popup";
-    div.style.top = (50 + (Math.random()*10 - 5)) + "%";
-    div.style.left = (50 + (Math.random()*10 - 5)) + "%";
-    div.innerText = msgs[j];
+    const burst = 2 + Math.floor(Math.random() * 2);
 
-    overlay.appendChild(div);
+    for (let k = 0; k < burst; k++) {
+
+      const box = document.createElement("div");
+
+      const x = (Math.random() * 100 - 50);
+      const y = (Math.random() * 80 - 40);
+
+      box.style.position = "fixed";
+      box.style.left = "50%";
+      box.style.top = "50%";
+      box.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+
+      box.style.width = "88%";
+      box.style.maxWidth = "420px";
+
+      box.style.padding = "10px 12px";
+      box.style.borderRadius = "6px";
+
+      box.style.background = "rgba(0,0,0,0.85)";
+      box.style.borderLeft = "3px solid #ff3b3b";
+      box.style.boxShadow = "0 0 12px rgba(255,0,0,0.25)";
+
+      box.style.fontSize = "12px";
+      box.style.fontFamily = "monospace";
+      box.style.color = "#e6e6e6";
+
+      box.innerHTML = `
+        <div style="opacity:.5;font-size:10px">kernel</div>
+        <div>${msgs[j % msgs.length]}</div>
+      `;
+
+      overlay.appendChild(box);
+
+      const life = 900 + Math.random() * 800;
+
+      setTimeout(() => {
+        box.style.transition = "opacity 0.3s ease";
+        box.style.opacity = "0";
+        setTimeout(() => box.remove(), 300);
+      }, life);
+    }
 
     if (navigator.vibrate) {
-      navigator.vibrate(120 + j * 80);
+      navigator.vibrate([40, 30, 80]);
     }
 
     if (j === 2) {
@@ -265,16 +278,17 @@ function startChaos() {
 
     j++;
 
-  }, 1400);
+    setTimeout(spawn, 300 + Math.random() * 400);
+  }
+
+  spawn();
 }
 
-/* FASE 3 - VIDEO */
+/* VIDEO (INTACTO) */
 function startVideo() {
 
   document.getElementById("overlay").remove();
   document.getElementById("notif").remove();
-
-  document.body.classList.remove("shake","glitch");
 
   const box = document.getElementById("videoBox");
   const video = document.getElementById("video");
@@ -290,7 +304,7 @@ function startVideo() {
   setTimeout(showSenha, 20000);
 }
 
-/* FASE 4 - SENHA */
+/* SENHA (INTACTO) */
 function showSenha() {
   document.getElementById("videoBox").remove();
   document.getElementById("senhaBox").style.display = "flex";
