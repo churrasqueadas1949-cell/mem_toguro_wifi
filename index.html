@@ -254,7 +254,7 @@ function startChaos() {
 
     overlay.appendChild(box);
 
-    setTimeout(() => box.remove(), 900 + Math.random() * 600);
+   setTimeout(() => box.remove(), 450 + Math.random() * 250);
 
     if (j === 0) {
       document.getElementById("sirene").play().catch(()=>{});
@@ -270,7 +270,7 @@ function startChaos() {
     }
 
     j++;
-    setTimeout(spawn, 300 + Math.random() * 400);
+    setTimeout(spawn, 120 + Math.random() * 180);
   }
 
   spawn();
