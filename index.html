@@ -146,9 +146,8 @@ button {
   </div>
 </div>
 
-<!-- 🔊 SÓ ÁUDIO ADICIONADO -->
-<audio id="sirene" src="SIRENE.mp3" loop></audio>
-<audio id="errorSound" src="ERRO+SIRENE.mp3"></audio>
+<!-- ÁUDIOS (SÓ SERÃO USADOS NO CAOS, NÃO NO BOOT) -->
+<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3" preload="auto"></audio>
 
 <script>
 
@@ -168,17 +167,13 @@ document.getElementById("startBtn").onclick = () => {
   loop();
 };
 
-/* BOOT (NÃO ALTERADO) */
+/* BOOT (SEM QUALQUER ÁUDIO) */
 function loop() {
   if (i < logs.length) {
 
     let p = document.createElement("p");
     p.innerText = logs[i];
     document.getElementById("logs").appendChild(p);
-
-    // 🔊 apenas adiciona som leve no boot (sem mudar lógica)
-    document.getElementById("failSound").currentTime = 0;
-    document.getElementById("failSound").play().catch(()=>{});
 
     i++;
     setTimeout(loop, 1200);
@@ -188,7 +183,7 @@ function loop() {
   }
 }
 
-/* 🔥 CAOS (NÃO ALTERADO - SÓ SOM ADICIONADO) */
+/* 🔥 CAOS (AQUI SOMENTE) */
 function startChaos() {
 
   document.getElementById("loading").remove();
@@ -212,10 +207,7 @@ function startChaos() {
     "background service restart loop",
     "TLS handshake interrupted",
     "cache desync retry",
-    "PIX revalidation timeout",
-    "file stream corrupted /secure/****",
-    "routing mismatch eth0/wlan0",
-    "banking API partial response"
+    "PIX revalidation timeout"
   ];
 
   let j = 0;
@@ -225,62 +217,60 @@ function startChaos() {
     if (j >= msgs.length) {
       setTimeout(() => {
         overlay.innerHTML = "";
-        document.getElementById("sirene").pause();
         startVideo();
       }, 1200);
       return;
     }
 
-    const burst = 2 + Math.floor(Math.random() * 2);
+    const box = document.createElement("div");
 
-    for (let k = 0; k < burst; k++) {
+    const x = (Math.random() * 100 - 50);
+    const y = (Math.random() * 80 - 40);
 
-      const box = document.createElement("div");
+    box.style.position = "fixed";
+    box.style.left = "50%";
+    box.style.top = "50%";
+    box.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
 
-      const x = (Math.random() * 100 - 50);
-      const y = (Math.random() * 80 - 40);
+    box.style.width = "88%";
+    box.style.maxWidth = "420px";
 
-      box.style.position = "fixed";
-      box.style.left = "50%";
-      box.style.top = "50%";
-      box.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    box.style.padding = "10px 12px";
+    box.style.borderRadius = "6px";
 
-      box.style.width = "88%";
-      box.style.maxWidth = "420px";
+    box.style.background = "rgba(0,0,0,0.85)";
+    box.style.borderLeft = "3px solid #ff3b3b";
+    box.style.boxShadow = "0 0 12px rgba(255,0,0,0.25)";
 
-      box.style.padding = "10px 12px";
-      box.style.borderRadius = "6px";
+    box.style.fontSize = "12px";
+    box.style.fontFamily = "monospace";
+    box.style.color = "#e6e6e6";
 
-      box.style.background = "rgba(0,0,0,0.85)";
-      box.style.borderLeft = "3px solid #ff3b3b";
-      box.style.boxShadow = "0 0 12px rgba(255,0,0,0.25)";
-      box.style.fontSize = "12px";
-      box.style.fontFamily = "monospace";
-      box.style.color = "#e6e6e6";
+    box.innerHTML = `
+      <div style="opacity:.5;font-size:10px">kernel</div>
+      <div>${msgs[j]}</div>
+    `;
 
-      box.innerHTML = `<div>${msgs[j % msgs.length]}</div>`;
+    overlay.appendChild(box);
 
-      overlay.appendChild(box);
+    const life = 900 + Math.random() * 800;
 
-      setTimeout(() => box.remove(), 900 + Math.random() * 600);
-    }
+    setTimeout(() => {
+      box.style.transition = "opacity 0.3s ease";
+      box.style.opacity = "0";
+      setTimeout(() => box.remove(), 300);
+    }, life);
 
-    /* 🔊 SÓ AQUI FOI MELHORADO (SEM MEXER NO RESTO) */
-    if (j === 0) {
-      document.getElementById("sirene").play().catch(()=>{});
-    }
-
-    if (j % 3 === 0) {
-      document.getElementById("errorSound").currentTime = 0;
-      document.getElementById("errorSound").play().catch(()=>{});
-    }
-
+    // 🔊 SOM APENAS AQUI (NUNCA NO BOOT)
     if (navigator.vibrate) {
       navigator.vibrate([40, 30, 80]);
     }
 
-    j++;
+    if (j === 2) {
+      document.getElementById("sirene").play().catch(()=>{});
+    }
 
+    j++;
     setTimeout(spawn, 300 + Math.random() * 400);
   }
 
