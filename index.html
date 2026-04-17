@@ -4,15 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>System Access</title>
+<title>System Status</title>
 
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
   background: black;
   color: white;
-  height: 100vh;
+  font-family: Arial;
   overflow: hidden;
 }
 
@@ -21,8 +20,8 @@ body {
   position: fixed;
   inset: 0;
   margin: auto;
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
   border: none;
   background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
@@ -42,36 +41,33 @@ body {
 
 /* LOGS */
 #logs {
-  margin-top: 20px;
+  text-align: center;
   font-size: 14px;
   opacity: 0.85;
-  text-align: center;
 }
 
-/* NOTIF */
+/* ALERTA */
 #notif {
   position: fixed;
   top: -120px;
   width: 100%;
-  background: #202124;
-  padding: 14px;
-  transition: top 0.4s;
-  z-index: 10;
+  background: #111;
+  padding: 12px;
+  transition: 0.4s;
+  border-bottom: 1px solid red;
 }
 
-/* POPUP */
 #popup {
   position: fixed;
   bottom: -200px;
   width: 100%;
-  background: #1c1c1c;
+  background: #1a1a1a;
   padding: 18px;
-  border-top: 3px solid red;
-  transition: bottom 0.4s;
-  z-index: 10;
+  border-top: 2px solid red;
+  transition: 0.4s;
 }
 
-/* GLITCH */
+/* CAOS VISUAL */
 .shake {
   animation: shake 0.08s infinite;
 }
@@ -82,65 +78,62 @@ body {
   100% { transform: translate(2px,2px); }
 }
 
-.corrupt {
-  animation: corrupt 0.06s infinite;
+.glitch {
+  animation: glitch 0.1s infinite;
 }
 
-@keyframes corrupt {
-  0% { filter: hue-rotate(0deg) contrast(1); }
-  50% { filter: hue-rotate(140deg) contrast(1.5); }
-  100% { filter: hue-rotate(0deg) contrast(1); }
+@keyframes glitch {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(120deg) contrast(1.4); }
+  100% { filter: hue-rotate(0deg); }
 }
 
-/* FINAL */
-#final {
-  display: none;
+/* VIDEO */
+#videoBox {
   position: fixed;
   inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
+
+video {
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* SENHA */
+#senhaBox {
+  position: fixed;
+  inset: 0;
+  display: none;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   text-align: center;
 }
 
-/* 🎬 VIDEO MAIOR E CENTRAL */
-video {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  border-radius: 0;
-  object-fit: cover;
-  opacity: 0;
-  transform: scale(1.05);
-  transition: 0.6s ease;
-}
-
-/* SENHA */
-#senhaBox {
-  margin-top: 20px;
+.card {
   background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 14px;
-  padding: 18px 28px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 .senha {
   font-size: 34px;
-  font-weight: bold;
-  margin-top: 5px;
+  margin: 10px 0;
 }
 
-/* BOTÃO COPIAR */
-#copyBtn {
-  margin-top: 12px;
+button {
+  margin-top: 10px;
   padding: 10px 14px;
-  border: 1px solid white;
   background: transparent;
+  border: 1px solid white;
   color: white;
-  border-radius: 8px;
 }
 </style>
 </head>
@@ -149,45 +142,37 @@ video {
 
 <button id="startBtn">CONECTAR</button>
 
-<div id="notif">📶 Conectando à rede Wi-Fi...</div>
+<div id="notif">⚠ System Alert</div>
 <div id="popup"></div>
 
 <div id="loading">
   <div id="logs"></div>
 </div>
 
-<div id="final">
-
-  <video id="video" playsinline preload="auto">
+<div id="videoBox">
+  <video id="video" playsinline>
     <source src="0416.mp4" type="video/mp4">
   </video>
-
-  <div id="senhaBox">
-    <div>🔑 Acesso Wi-Fi</div>
-    <div class="senha" id="senha">mauricio$2018</div>
-
-    <button id="copyBtn" onclick="copiarSenha()">Copiar senha</button>
-  </div>
-
 </div>
 
-<!-- SIRENE -->
-<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
+<div id="senhaBox">
+  <div class="card">
+    <div>🔑 ACCESS KEY</div>
+    <div class="senha" id="senha">mauricio$2018</div>
+    <button onclick="copiar()">COPIAR SENHA</button>
+  </div>
+</div>
 
-<!-- BEEPS -->
-<audio id="beep1" src="https://www.soundjay.com/button/sounds/button-09.mp3"></audio>
-<audio id="beep2" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
-<audio id="beep3" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
 
 <script>
 
 const logs = [
-  "Conectando à rede Wi-Fi...",
-  "Obtendo endereço IP...",
-  "Autenticando dispositivo...",
-  "Verificando sinal...",
-  "Sincronizando conexão...",
-  "Conexão estabelecida"
+  "Initializing system...",
+  "Checking network...",
+  "Verifying security...",
+  "Connection unstable...",
+  "System anomaly detected..."
 ];
 
 let i = 0;
@@ -195,23 +180,11 @@ let i = 0;
 document.getElementById("startBtn").onclick = () => {
   document.getElementById("startBtn").remove();
   document.getElementById("loading").style.display = "flex";
-  bootLoop();
+  loop();
 };
 
-/* SOM */
-function playSound(index) {
-  const sounds = [
-    document.getElementById("beep1"),
-    document.getElementById("beep2"),
-    document.getElementById("beep3")
-  ];
-  let s = sounds[index % sounds.length];
-  s.currentTime = 0;
-  s.play().catch(()=>{});
-}
-
 /* BOOT */
-function bootLoop() {
+function loop() {
 
   if (i < logs.length) {
 
@@ -219,67 +192,91 @@ function bootLoop() {
     p.innerText = logs[i];
     document.getElementById("logs").appendChild(p);
 
-    playSound(i);
-
     i++;
-    setTimeout(bootLoop, 1200);
+    setTimeout(loop, 1400);
 
   } else {
-    setTimeout(erro, 1000);
+    setTimeout(failureSequence, 1200);
   }
 }
 
-/* ERRO */
-function erro() {
+/* CAOS CONTROLADO */
+function failureSequence() {
 
   document.getElementById("notif").style.top = "0";
-  document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML = "<b>Instabilidade detectada</b>";
 
-  document.body.classList.add("shake","corrupt");
+  document.body.classList.add("shake","glitch");
 
-  document.getElementById("sirene").play().catch(()=>{});
+  const popup = document.getElementById("popup");
 
-  if (navigator.vibrate) {
-    navigator.vibrate([200,100,300]);
-  }
+  const msgs = [
+    "WARNING: system instability",
+    "critical process failure",
+    "security breach detected",
+    "network corruption increasing",
+    "emergency shutdown initiated"
+  ];
 
-  setTimeout(iniciarVideo, 2500);
+  let j = 0;
+
+  const interval = setInterval(() => {
+
+    if (j >= msgs.length) {
+      clearInterval(interval);
+      setTimeout(playVideo, 1800);
+      return;
+    }
+
+    popup.innerHTML = msgs[j];
+    popup.style.bottom = "0";
+
+    if (navigator.vibrate) {
+      navigator.vibrate(100 + j * 50);
+    }
+
+    if (j === 2) {
+      document.getElementById("sirene").play().catch(()=>{});
+    }
+
+    j++;
+
+  }, 1500);
 }
 
 /* VIDEO */
-function iniciarVideo() {
+function playVideo() {
 
   document.getElementById("loading").remove();
   document.getElementById("notif").remove();
   document.getElementById("popup").remove();
 
+  document.body.classList.remove("shake","glitch");
+
+  const box = document.getElementById("videoBox");
   const video = document.getElementById("video");
-  const final = document.getElementById("final");
 
-  final.style.display = "flex";
+  box.style.display = "flex";
 
-  setTimeout(() => {
+  requestAnimationFrame(() => {
     video.style.opacity = "1";
     video.play().catch(()=>{});
-  }, 200);
+  });
 
-  video.onended = mostrarSenha;
+  video.onended = showSenha;
 
-  setTimeout(mostrarSenha, 20000);
+  setTimeout(showSenha, 20000);
 }
 
 /* SENHA */
-function mostrarSenha() {
-  document.getElementById("video").style.display = "none";
+function showSenha() {
+
+  document.getElementById("videoBox").remove();
 
   const box = document.getElementById("senhaBox");
-  box.style.opacity = "1";
-  box.style.transform = "translateY(0)";
+  box.style.display = "flex";
 }
 
-/* COPIAR SENHA */
-function copiarSenha() {
+function copiar() {
   navigator.clipboard.writeText(document.getElementById("senha").innerText);
   alert("Senha copiada!");
 }
