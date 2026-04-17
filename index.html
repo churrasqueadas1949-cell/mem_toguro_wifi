@@ -9,10 +9,9 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
+  font-family: monospace;
   background: black;
-  color: white;
-  height: 100vh;
+  color: #00ff9d;
   overflow: hidden;
 }
 
@@ -21,126 +20,114 @@ body {
   position: fixed;
   inset: 0;
   margin: auto;
-  width: 150px;
-  height: 150px;
+  width: 160px;
+  height: 160px;
   border-radius: 50%;
-  border: none;
-  background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
-  color: white;
+  border: 1px solid #00ff9d;
+  background: radial-gradient(circle, #003c2a, #000);
+  color: #00ff9d;
   font-weight: bold;
 }
 
 /* BOOT */
-#loading {
+#boot {
   position: fixed;
   inset: 0;
   display: none;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  padding: 15px;
 }
 
 /* LOGS */
-#logs {
-  margin-top: 20px;
-  font-size: 14px;
-  opacity: 0.85;
-  text-align: center;
+#screen {
+  max-width: 600px;
+  margin: auto;
+  margin-top: 8vh;
 }
 
-/* NOTIF */
-#notif {
+.line {
+  margin: 6px 0;
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ALERT */
+#alert {
   position: fixed;
   top: -120px;
   width: 100%;
-  background: #202124;
-  padding: 14px;
-  transition: top 0.4s;
-  z-index: 10;
-}
-
-/* POPUP */
-#popup {
-  position: fixed;
-  bottom: -200px;
-  width: 100%;
-  background: #1c1c1c;
-  padding: 18px;
-  border-top: 3px solid red;
-  transition: bottom 0.4s;
-  z-index: 10;
-}
-
-/* GLITCH */
-.shake {
-  animation: shake 0.08s infinite;
-}
-
-@keyframes shake {
-  0% { transform: translate(2px,2px); }
-  50% { transform: translate(-2px,-2px); }
-  100% { transform: translate(2px,2px); }
-}
-
-.corrupt {
-  animation: corrupt 0.06s infinite;
-}
-
-@keyframes corrupt {
-  0% { filter: hue-rotate(0deg) contrast(1); }
-  50% { filter: hue-rotate(140deg) contrast(1.5); }
-  100% { filter: hue-rotate(0deg) contrast(1); }
-}
-
-/* 💥 VIDRO RACHADO OVERLAY */
-#crack {
-  position: fixed;
-  inset: 0;
-  background: url("https://i.imgur.com/3g7nmJC.png") center/cover no-repeat;
-  opacity: 0;
-  pointer-events: none;
+  background: #111;
+  border-bottom: 1px solid red;
+  color: red;
+  padding: 12px;
   transition: 0.4s;
-  mix-blend-mode: screen;
-  z-index: 5;
-}
-
-/* FINAL */
-#final {
-  display: none;
-  position: fixed;
-  inset: 0;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
+  z-index: 10;
 }
 
 /* VIDEO */
+#videoBox {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: black;
+}
+
 video {
-  width: 95%;
-  max-width: 500px;
-  border-radius: 12px;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: 0.6s ease;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
 /* SENHA */
 #senhaBox {
-  margin-top: 20px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 14px;
-  padding: 18px 28px;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
+  position: fixed;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  background: black;
+}
+
+.card {
+  border: 1px solid #00ff9d;
+  padding: 20px 30px;
+  border-radius: 10px;
 }
 
 .senha {
-  font-size: 34px;
-  font-weight: bold;
+  font-size: 36px;
+  margin: 10px 0;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  background: transparent;
+  border: 1px solid #00ff9d;
+  color: #00ff9d;
+}
+
+/* IA */
+#aiBox {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* MAPA */
+#netMap {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.12;
+  pointer-events: none;
 }
 </style>
 </head>
@@ -149,149 +136,219 @@ video {
 
 <button id="startBtn">CONECTAR</button>
 
-<div id="notif">⚠ System<br>Network anomaly detected</div>
-<div id="popup"></div>
+<div id="alert">⚠ SYSTEM BREACH</div>
 
-<div id="crack"></div>
-
-<div id="loading">
-  <div id="logs"></div>
+<div id="boot">
+  <div id="screen"></div>
 </div>
 
-<div id="final">
+<canvas id="netMap"></canvas>
+<div id="aiBox"></div>
 
-  <video id="video" playsinline preload="auto">
+<div id="videoBox">
+  <video id="video" playsinline>
     <source src="0416.mp4" type="video/mp4">
   </video>
-
-  <div id="senhaBox">
-    <div>🔑 Acesso Wi-Fi</div>
-    <div class="senha">mauricio$2018</div>
-  </div>
-
 </div>
 
-<!-- SIRENE -->
-<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
+<div id="senhaBox">
+  <div class="card">
+    <div>ACCESS GRANTED</div>
+    <div class="senha" id="senha">mauricio$2018</div>
+    <button onclick="copySenha()">COPY PASSWORD</button>
+  </div>
+</div>
 
-<!-- BEEPS BOOT -->
-<audio id="beep1" src="https://www.soundjay.com/button/sounds/button-09.mp3"></audio>
-<audio id="beep2" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
-<audio id="beep3" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="beep" src="https://www.soundjay.com/button/sounds/button-09.mp3"></audio>
+<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
 
 <script>
 
-const logs = [
-  "Iniciando kernel...",
-  "Carregando módulos...",
-  "Bypass de segurança...",
-  "Escaneando rede local...",
-  "Injeção de pacote suspeito...",
-  "SISTEMA COMPROMETIDO"
+/* ======================
+   BOOT LOGS + TYPE
+====================== */
+const lines = [
+  "Initializing system...",
+  "Scanning network...",
+  "Injecting module...",
+  "Bypassing firewall...",
+  "Device trace enabled...",
+  "WARNING: intrusion detected"
 ];
 
 let i = 0;
+const screen = document.getElementById("screen");
 
 document.getElementById("startBtn").onclick = () => {
   document.getElementById("startBtn").remove();
-  document.getElementById("loading").style.display = "flex";
+  document.getElementById("boot").style.display = "block";
 
-  bootLoop();
+  startAI();
+  startMap();
+  typeLine();
 };
 
-/* 🔊 SOM SINCRONIZADO POR LINHA */
-function playSound(index) {
-  const sounds = [
-    document.getElementById("beep1"),
-    document.getElementById("beep2"),
-    document.getElementById("beep3")
-  ];
+function typeLine() {
+  if (i >= lines.length) return triggerError();
 
-  let s = sounds[index % sounds.length];
-  s.currentTime = 0;
-  s.play().catch(()=>{});
-}
+  let line = document.createElement("div");
+  line.className = "line";
+  screen.appendChild(line);
 
-/* BOOT */
-function bootLoop() {
+  let text = lines[i];
+  let j = 0;
 
-  if (i < logs.length) {
-
-    let p = document.createElement("p");
-    p.innerText = logs[i];
-    document.getElementById("logs").appendChild(p);
-
-    playSound(i); // 🔊 sincronizado
-
-    i++;
-
-    setTimeout(bootLoop, 800 + Math.random()*600);
-
-  } else {
-    setTimeout(erro, 800);
+  function type() {
+    if (j < text.length) {
+      line.innerHTML = text.substring(0, j) + "_";
+      j++;
+      setTimeout(type, 25);
+    } else {
+      line.innerHTML = text;
+      document.getElementById("beep").play().catch(()=>{});
+      i++;
+      setTimeout(typeLine, 600);
+    }
   }
+
+  type();
 }
 
-/* 💀 ERRO + CORRUPÇÃO */
-function erro() {
+/* ======================
+   ALERTA
+====================== */
+function triggerError() {
 
-  document.getElementById("notif").style.top = "0";
-  document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML = "<b>SYSTEM BREACH DETECTED</b>";
+  document.getElementById("alert").style.top = "0";
 
-  document.body.classList.add("shake", "corrupt");
+  document.body.style.filter = "contrast(1.3) hue-rotate(120deg)";
 
-  // 💥 vidro rachando
-  const crack = document.getElementById("crack");
-  crack.style.opacity = "1";
+  document.getElementById("sirene").play().catch(()=>{});
 
-  // 🔊 sirene
-  const s = document.getElementById("sirene");
-  s.currentTime = 0;
-  s.play().catch(()=>{});
-
-  // 📳 vibração
   if (navigator.vibrate) {
-    navigator.vibrate([200,100,300,100,500,200,600]);
+    navigator.vibrate([200,100,300,200,500]);
   }
 
-  setTimeout(iniciarVideo, 2500);
+  setTimeout(startVideo, 2500);
 }
 
-/* 🎬 VÍDEO */
-function iniciarVideo() {
+/* ======================
+   VIDEO
+====================== */
+function startVideo() {
 
-  document.body.classList.remove("shake","corrupt");
+  document.getElementById("boot").remove();
+  document.getElementById("alert").remove();
+  document.getElementById("aiBox").remove();
+  document.getElementById("netMap").remove();
 
-  document.getElementById("loading").remove();
-  document.getElementById("notif").remove();
-  document.getElementById("popup").remove();
-  document.getElementById("crack").remove();
-
+  const box = document.getElementById("videoBox");
   const video = document.getElementById("video");
-  const final = document.getElementById("final");
 
-  final.style.display = "flex";
+  box.style.display = "flex";
 
-  setTimeout(() => {
-    video.style.opacity = "1";
-    video.style.transform = "scale(1)";
-    video.play().catch(()=>{});
-  }, 200);
+  setTimeout(() => video.play().catch(()=>{}), 300);
 
-  video.onended = mostrarSenha;
+  video.onended = showPassword;
 
-  setTimeout(mostrarSenha, 20000);
+  setTimeout(showPassword, 20000);
 }
 
-/* 🔑 SENHA */
-function mostrarSenha() {
+/* ======================
+   SENHA
+====================== */
+function showPassword() {
+  document.getElementById("videoBox").remove();
+  document.getElementById("senhaBox").style.display = "flex";
+}
 
-  document.getElementById("video").style.display = "none";
+function copySenha() {
+  navigator.clipboard.writeText(document.getElementById("senha").innerText);
+  alert("Senha copiada!");
+}
 
-  const box = document.getElementById("senhaBox");
-  box.style.opacity = "1";
-  box.style.transform = "translateY(0)";
+/* ======================
+   IA FAKE
+====================== */
+const aiMsgs = [
+  "AI: monitorando atividade...",
+  "AI: comportamento anômalo detectado...",
+  "AI: rastreando dispositivo...",
+  "AI: tentativa de acesso externo...",
+  "AI: bloqueio temporário ativado..."
+];
+
+let aiIndex = 0;
+
+function startAI() {
+  const box = document.getElementById("aiBox");
+
+  setInterval(() => {
+    if (aiIndex < aiMsgs.length) {
+      box.innerHTML += aiMsgs[aiIndex] + "<br>";
+      aiIndex++;
+    }
+  }, 1200);
+}
+
+/* ======================
+   MAPA DE REDE
+====================== */
+const canvas = document.getElementById("netMap");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let nodes = [];
+
+for (let i = 0; i < 35; i++) {
+  nodes.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    vx: (Math.random() - 0.5) * 1.2,
+    vy: (Math.random() - 0.5) * 1.2
+  });
+}
+
+function startMap() {
+  draw();
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  for (let i = 0; i < nodes.length; i++) {
+    for (let j = i+1; j < nodes.length; j++) {
+
+      let dx = nodes[i].x - nodes[j].x;
+      let dy = nodes[i].y - nodes[j].y;
+      let dist = Math.sqrt(dx*dx + dy*dy);
+
+      if (dist < 120) {
+        ctx.strokeStyle = "rgba(0,255,157,0.2)";
+        ctx.beginPath();
+        ctx.moveTo(nodes[i].x, nodes[i].y);
+        ctx.lineTo(nodes[j].x, nodes[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  for (let n of nodes) {
+    n.x += n.vx;
+    n.y += n.vy;
+
+    if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+    if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+
+    ctx.fillStyle = "#00ff9d";
+    ctx.beginPath();
+    ctx.arc(n.x, n.y, 2, 0, Math.PI*2);
+    ctx.fill();
+  }
+
+  requestAnimationFrame(draw);
 }
 
 </script>
