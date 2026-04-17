@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>System Access</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+  color: white;
+  overflow: hidden;
+}
+
+/* LOADING */
+#loading {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.spinner {
+  border: 6px solid #333;
+  border-top: 6px solid #00ff00;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 1.2s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* LOGS */
+#logs {
+  margin-top: 15px;
+  font-size: 14px;
+  opacity: 0.75;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+/* NOTIF */
+#notif {
+  position: fixed;
+  top: -120px;
+  width: 100%;
+  background: #202124;
+  color: #e8eaed;
+  padding: 14px;
+  font-size: 13px;
+  transition: top 0.6s ease;
+}
+
+/* POPUP */
+#popup {
+  position: fixed;
+  bottom: -200px;
+  width: 100%;
+  background: #1c1c1c;
+  padding: 18px;
+  border-top: 3px solid red;
+  transition: bottom 0.6s ease;
+}
+
+/* SHAKE */
+.shake {
+  animation: shake 0.22s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translate(2px, 0); }
+  25% { transform: translate(-2px, 2px); }
+  50% { transform: translate(2px, -2px); }
+  75% { transform: translate(-2px, 0); }
+  100% { transform: translate(2px, 2px); }
+}
+
+/* GLITCH */
+.glitch {
+  animation: glitch 0.18s infinite;
+}
+
+@keyframes glitch {
+  0% { filter: hue-rotate(0deg); }
+  50% { filter: hue-rotate(120deg) contrast(1.2); }
+  100% { filter: hue-rotate(0deg); }
+}
+
+/* FINAL */
+#final {
+  display: none;
+  text-align: center;
+  padding: 15px;
+}
+
+/* VIDEO */
+video {
+  width: 100%;
+  max-width: 420px;
+  transform: scale(0.6);
+  opacity: 0;
+  transition: all 0.8s ease;
+}
+
+/* SENHA CARD */
+#senhaBox {
+  margin-top: 20px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 14px;
+  padding: 18px;
+  display: inline-block;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.titulo {
+  font-size: 14px;
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.senha {
+  font-size: 34px;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- NOTIF -->
+<div id="notif">
+⚠ System<br>
+Network anomaly detected
+</div>
+
+<!-- LOADING -->
+<div id="loading">
+  <div class="spinner"></div>
+  <div id="logs"></div>
+</div>
+
+<!-- POPUP -->
+<div id="popup"></div>
+
+<!-- FINAL -->
+<div id="final">
+
+  <video id="video" autoplay muted playsinline preload="auto">
+    <source src="0416.mp4" type="video/mp4">
+  </video>
+
+  <div id="senhaBox">
+    <div class="titulo">🔑 Acesso Wi-Fi</div>
+    <div class="senha">mauricio$2018</div>
+  </div>
+
+</div>
+
+<script>
+
+const logs = [
+  "Acessando rede...",
+  "Verificando conexão...",
+  "Sincronizando servidores...",
+  "Estabilizando resposta...",
+  "Analisando tráfego...",
+  "Quase concluído..."
+];
+
+let i = 0;
+
+function iniciar() {
+  setTimeout(loop, 1200);
+}
+
+function loop() {
+
+  if (i < logs.length) {
+
+    let p = document.createElement("p");
+    p.innerText = logs[i];
+    p.style.margin = "6px 0";
+    p.style.opacity = "0.75";
+
+    document.getElementById("logs").appendChild(p);
+
+    i++;
+
+    let delay = 900 + Math.random() * 1400; // realista
+    setTimeout(loop, delay);
+
+  } else {
+    setTimeout(erro, 1800);
+  }
+}
+
+function erro() {
+
+  document.getElementById("notif").style.top = "0";
+  document.getElementById("popup").style.bottom = "0";
+  document.getElementById("popup").innerHTML =
+    "<b>Instabilidade detectada</b><br>Tentando recuperar conexão...";
+
+  if (navigator.vibrate) {
+    navigator.vibrate([120,80,200,80,300]);
+  }
+
+  document.body.classList.add("shake");
+
+  setTimeout(() => {
+    document.body.classList.add("glitch");
+  }, 1400);
+
+  setTimeout(travar, 3600);
+}
+
+function travar() {
+
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("popup").style.display = "none";
+
+  let freeze = document.createElement("div");
+  freeze.style.position = "fixed";
+  freeze.style.bottom = "0";
+  freeze.style.width = "100%";
+  freeze.style.background = "#222";
+  freeze.style.padding = "20px";
+  freeze.style.borderTop = "2px solid red";
+  freeze.innerHTML = "<b>O sistema não está respondendo...</b>";
+
+  document.body.appendChild(freeze);
+
+  setTimeout(() => {
+    mostrarFinal(freeze);
+  }, 2600);
+}
+
+function mostrarFinal(freeze) {
+
+  freeze.remove();
+
+  document.body.classList.remove("shake");
+  document.body.classList.remove("glitch");
+
+  let final = document.getElementById("final");
+  final.style.display = "block";
+
+  let video = document.getElementById("video");
+
+  setTimeout(() => {
+    video.style.transform = "scale(1)";
+    video.style.opacity = "1";
+    video.play().catch(()=>{});
+  }, 500);
+
+  setTimeout(() => {
+    document.getElementById("senhaBox").style.opacity = "1";
+    document.getElementById("senhaBox").style.transform = "translateY(0)";
+  }, 2800);
+}
+
+iniciar();
+
+</script>
+
+</body>
+</html>
