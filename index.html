@@ -21,12 +21,16 @@ body {
   position: fixed;
   inset: 0;
   margin: auto;
+
   width: 150px;
   height: 150px;
+
   border-radius: 50%;
   border: none;
+
   background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
   color: white;
+
   font-size: 16px;
   font-weight: bold;
 }
@@ -72,18 +76,7 @@ body {
   z-index: 10;
 }
 
-/* CORRUPÇÃO DE TELA */
-.corrupt {
-  animation: corrupt 0.08s infinite;
-}
-
-@keyframes corrupt {
-  0% { filter: hue-rotate(0deg) contrast(1); }
-  50% { filter: hue-rotate(120deg) contrast(1.4); }
-  100% { filter: hue-rotate(0deg) contrast(1); }
-}
-
-/* SHAKE FORTE */
+/* EFEITOS DE ERRO */
 .shake {
   animation: shake 0.1s infinite;
 }
@@ -92,6 +85,16 @@ body {
   0% { transform: translate(2px, 2px); }
   50% { transform: translate(-2px, -2px); }
   100% { transform: translate(2px, 2px); }
+}
+
+.corrupt {
+  animation: corrupt 0.08s infinite;
+}
+
+@keyframes corrupt {
+  0% { filter: hue-rotate(0deg) contrast(1); }
+  50% { filter: hue-rotate(120deg) contrast(1.4); }
+  100% { filter: hue-rotate(0deg) contrast(1); }
 }
 
 /* FINAL */
@@ -108,13 +111,18 @@ body {
 /* VIDEO */
 video {
   width: 95%;
-  height: auto;
   max-width: 500px;
   border-radius: 12px;
+
   opacity: 0;
   transform: scale(0.8);
   transition: 0.6s ease;
+
   object-fit: cover;
+
+  /* 🔥 GARANTIA: nunca herdar glitch */
+  animation: none !important;
+  filter: none !important;
 }
 
 /* SENHA */
@@ -124,6 +132,7 @@ video {
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 14px;
   padding: 18px 28px;
+
   opacity: 0;
   transform: translateY(20px);
   transition: all 0.8s ease;
@@ -148,6 +157,7 @@ video {
 </div>
 
 <div id="final">
+
   <video id="video" playsinline preload="auto">
     <source src="0416.mp4" type="video/mp4">
   </video>
@@ -156,14 +166,10 @@ video {
     <div>🔑 Acesso Wi-Fi</div>
     <div class="senha">mauricio$2018</div>
   </div>
+
 </div>
 
-<!-- SIRENE -->
 <audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
-
-<!-- VOZ FAKE BOOT -->
-<audio id="voice1" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
-<audio id="voice2" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
 
 <script>
 
@@ -172,7 +178,7 @@ const logs = [
   "Verificando conexão...",
   "Sincronizando servidores...",
   "Injetando protocolo...",
-  "Detectando invasão...",
+  "Detectando falhas...",
   "Sistema instável..."
 ];
 
@@ -181,18 +187,9 @@ let i = 0;
 document.getElementById("startBtn").onclick = () => {
   document.getElementById("startBtn").remove();
   document.getElementById("loading").style.display = "flex";
-
-  playBootAudio();
   loop();
 };
 
-/* 🔊 ÁUDIO SINCRONIZADO BOOT */
-function playBootAudio() {
-  setTimeout(() => document.getElementById("voice1").play().catch(()=>{}), 500);
-  setTimeout(() => document.getElementById("voice2").play().catch(()=>{}), 2000);
-}
-
-/* LOGS */
 function loop() {
 
   if (i < logs.length) {
@@ -206,25 +203,25 @@ function loop() {
     setTimeout(loop, 900 + Math.random() * 800);
 
   } else {
-    setTimeout(corromper, 1000);
+    setTimeout(erro, 1000);
   }
 }
 
-/* 💀 CORRUPÇÃO DE SISTEMA */
-function corromper() {
-
-  document.body.classList.add("shake", "corrupt");
+function erro() {
 
   document.getElementById("notif").style.top = "0";
   document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML = "<b>SYSTEM CORRUPTION DETECTED</b>";
+  document.getElementById("popup").innerHTML =
+    "<b>SYSTEM CORRUPTION DETECTED</b>";
+
+  document.body.classList.add("shake", "corrupt");
 
   // 🔊 SIRENE
   const s = document.getElementById("sirene");
   s.currentTime = 0;
   s.play().catch(()=>{});
 
-  // 📳 vibração forte
+  // 📳 vibração
   if (navigator.vibrate) {
     navigator.vibrate([200,100,300,100,500,100,600]);
   }
@@ -232,8 +229,10 @@ function corromper() {
   setTimeout(iniciarVideo, 2500);
 }
 
-/* 🎬 VÍDEO */
 function iniciarVideo() {
+
+  // 🚨 REMOVE TODOS OS EFEITOS (CORREÇÃO PRINCIPAL)
+  document.body.classList.remove("shake", "corrupt");
 
   document.getElementById("loading").remove();
   document.getElementById("notif").remove();
@@ -244,27 +243,31 @@ function iniciarVideo() {
 
   final.style.display = "flex";
 
+  // estado limpo garantido
+  video.style.opacity = "1";
+  video.style.transform = "scale(1)";
+
+  video.play().catch(()=>{});
+
+  let acabou = false;
+
+  video.onended = () => {
+    acabou = true;
+    mostrarSenha();
+  };
+
   setTimeout(() => {
-    video.style.opacity = "1";
-    video.style.transform = "scale(1)";
-    video.play().catch(()=>{});
-  }, 300);
-
-  video.onended = mostrarSenha;
-
-  // fallback
-  setTimeout(mostrarSenha, 20000);
+    if (!acabou) mostrarSenha();
+  }, 20000);
 }
 
-/* 🔑 SENHA */
 function mostrarSenha() {
-
-  document.body.classList.remove("shake", "corrupt");
 
   document.getElementById("video").style.display = "none";
 
-  document.getElementById("senhaBox").style.opacity = "1";
-  document.getElementById("senhaBox").style.transform = "translateY(0)";
+  const box = document.getElementById("senhaBox");
+  box.style.opacity = "1";
+  box.style.transform = "translateY(0)";
 }
 
 </script>
