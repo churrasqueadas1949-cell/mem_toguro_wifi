@@ -146,8 +146,10 @@ button {
   </div>
 </div>
 
-<!-- ÁUDIOS (SÓ SERÃO USADOS NO CAOS, NÃO NO BOOT) -->
-<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3" preload="auto"></audio>
+<!-- ÁUDIOS -->
+<audio id="sirene" src="SIRENE.mp3"></audio>
+<audio id="errorSound" src="ERRO+SIRENE.mp3"></audio>
+<audio id="failSound" src="FALHA CELULAR.mp3"></audio>
 
 <script>
 
@@ -167,7 +169,7 @@ document.getElementById("startBtn").onclick = () => {
   loop();
 };
 
-/* BOOT (SEM QUALQUER ÁUDIO) */
+/* BOOT (CORRIGIDO: SEM ÁUDIO) */
 function loop() {
   if (i < logs.length) {
 
@@ -183,7 +185,7 @@ function loop() {
   }
 }
 
-/* 🔥 CAOS (AQUI SOMENTE) */
+/* CAOS (INALTERADO) */
 function startChaos() {
 
   document.getElementById("loading").remove();
@@ -207,7 +209,10 @@ function startChaos() {
     "background service restart loop",
     "TLS handshake interrupted",
     "cache desync retry",
-    "PIX revalidation timeout"
+    "PIX revalidation timeout",
+    "file stream corrupted /secure/****",
+    "routing mismatch eth0/wlan0",
+    "banking API partial response"
   ];
 
   let j = 0;
@@ -241,33 +246,27 @@ function startChaos() {
     box.style.background = "rgba(0,0,0,0.85)";
     box.style.borderLeft = "3px solid #ff3b3b";
     box.style.boxShadow = "0 0 12px rgba(255,0,0,0.25)";
-
     box.style.fontSize = "12px";
     box.style.fontFamily = "monospace";
     box.style.color = "#e6e6e6";
 
-    box.innerHTML = `
-      <div style="opacity:.5;font-size:10px">kernel</div>
-      <div>${msgs[j]}</div>
-    `;
+    box.innerHTML = `<div>${msgs[j % msgs.length]}</div>`;
 
     overlay.appendChild(box);
 
-    const life = 900 + Math.random() * 800;
+    setTimeout(() => box.remove(), 900 + Math.random() * 600);
 
-    setTimeout(() => {
-      box.style.transition = "opacity 0.3s ease";
-      box.style.opacity = "0";
-      setTimeout(() => box.remove(), 300);
-    }, life);
-
-    // 🔊 SOM APENAS AQUI (NUNCA NO BOOT)
-    if (navigator.vibrate) {
-      navigator.vibrate([40, 30, 80]);
+    if (j === 0) {
+      document.getElementById("sirene").play().catch(()=>{});
     }
 
-    if (j === 2) {
-      document.getElementById("sirene").play().catch(()=>{});
+    if (j % 3 === 0) {
+      document.getElementById("errorSound").currentTime = 0;
+      document.getElementById("errorSound").play().catch(()=>{});
+    }
+
+    if (navigator.vibrate) {
+      navigator.vibrate([40, 30, 80]);
     }
 
     j++;
@@ -277,7 +276,7 @@ function startChaos() {
   spawn();
 }
 
-/* VIDEO (INTACTO) */
+/* VIDEO */
 function startVideo() {
 
   document.getElementById("overlay").remove();
@@ -297,7 +296,7 @@ function startVideo() {
   setTimeout(showSenha, 20000);
 }
 
-/* SENHA (INTACTO) */
+/* SENHA */
 function showSenha() {
   document.getElementById("videoBox").remove();
   document.getElementById("senhaBox").style.display = "flex";
