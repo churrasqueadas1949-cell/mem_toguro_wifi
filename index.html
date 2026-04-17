@@ -4,14 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>System Boot</title>
+<title>System Access</title>
 
 <style>
 body {
   margin: 0;
+  font-family: Arial, sans-serif;
   background: black;
   color: white;
-  font-family: Arial;
+  height: 100vh;
   overflow: hidden;
 }
 
@@ -26,11 +27,12 @@ body {
   border: none;
   background: radial-gradient(circle at 30% 30%, #2cff88, #0b6b3a);
   color: white;
+  font-size: 16px;
   font-weight: bold;
 }
 
-/* BOOT */
-#boot {
+/* LOADING */
+#loading {
   position: fixed;
   inset: 0;
   display: none;
@@ -39,6 +41,7 @@ body {
   align-items: center;
 }
 
+/* LOGS */
 #logs {
   margin-top: 20px;
   font-size: 14px;
@@ -46,16 +49,18 @@ body {
   text-align: center;
 }
 
-/* ALERT */
-#alert {
+/* NOTIF */
+#notif {
   position: fixed;
   top: -120px;
   width: 100%;
   background: #202124;
   padding: 14px;
-  transition: 0.4s;
+  transition: top 0.4s;
+  z-index: 10;
 }
 
+/* POPUP */
 #popup {
   position: fixed;
   bottom: -200px;
@@ -63,54 +68,69 @@ body {
   background: #1c1c1c;
   padding: 18px;
   border-top: 3px solid red;
-  transition: 0.4s;
+  transition: bottom 0.4s;
+  z-index: 10;
 }
 
-/* GLITCH */
-.glitch {
-  animation: glitch 0.12s infinite;
+/* CORRUPÇÃO DE TELA */
+.corrupt {
+  animation: corrupt 0.08s infinite;
 }
 
-@keyframes glitch {
-  0% { filter: hue-rotate(0deg); }
-  50% { filter: hue-rotate(120deg) contrast(1.3); }
-  100% { filter: hue-rotate(0deg); }
+@keyframes corrupt {
+  0% { filter: hue-rotate(0deg) contrast(1); }
+  50% { filter: hue-rotate(120deg) contrast(1.4); }
+  100% { filter: hue-rotate(0deg) contrast(1); }
 }
 
-/* VIDEO FULL REAL (SEM PISCAR) */
-#videoContainer {
+/* SHAKE FORTE */
+.shake {
+  animation: shake 0.1s infinite;
+}
+
+@keyframes shake {
+  0% { transform: translate(2px, 2px); }
+  50% { transform: translate(-2px, -2px); }
+  100% { transform: translate(2px, 2px); }
+}
+
+/* FINAL */
+#final {
+  display: none;
   position: fixed;
   inset: 0;
-  display: none;
-  background: black;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
+/* VIDEO */
 video {
-  width: 100%;
-  height: 100%;
+  width: 95%;
+  height: auto;
+  max-width: 500px;
+  border-radius: 12px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: 0.6s ease;
   object-fit: cover;
 }
 
 /* SENHA */
 #senhaBox {
-  position: fixed;
-  inset: 0;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: black;
-}
-
-.card {
+  margin-top: 20px;
   background: rgba(255,255,255,0.08);
-  padding: 20px 30px;
+  border: 1px solid rgba(255,255,255,0.2);
   border-radius: 14px;
-  backdrop-filter: blur(10px);
+  padding: 18px 28px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
 }
 
 .senha {
-  font-size: 36px;
+  font-size: 34px;
   font-weight: bold;
 }
 </style>
@@ -120,52 +140,60 @@ video {
 
 <button id="startBtn">CONECTAR</button>
 
-<div id="alert">⚠ SYSTEM WARNING</div>
+<div id="notif">⚠ System<br>Network anomaly detected</div>
 <div id="popup"></div>
 
-<div id="boot">
-  <div>BOOTING SYSTEM...</div>
+<div id="loading">
   <div id="logs"></div>
 </div>
 
-<div id="videoContainer">
-  <video id="video" playsinline>
+<div id="final">
+  <video id="video" playsinline preload="auto">
     <source src="0416.mp4" type="video/mp4">
   </video>
-</div>
 
-<div id="senhaBox">
-  <div class="card">
-    <div>🔑 WI-FI ACCESS</div>
+  <div id="senhaBox">
+    <div>🔑 Acesso Wi-Fi</div>
     <div class="senha">mauricio$2018</div>
   </div>
 </div>
 
-<audio id="sirene"
-src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
+<!-- SIRENE -->
+<audio id="sirene" src="https://www.soundjay.com/misc/sounds/siren-01.mp3"></audio>
+
+<!-- VOZ FAKE BOOT -->
+<audio id="voice1" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+<audio id="voice2" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
 
 <script>
 
 const logs = [
-  "Initializing system...",
-  "Checking network...",
-  "Injecting modules...",
-  "Scanning device...",
-  "Security bypass attempt...",
-  "SYSTEM ERROR DETECTED..."
+  "Acessando rede...",
+  "Verificando conexão...",
+  "Sincronizando servidores...",
+  "Injetando protocolo...",
+  "Detectando invasão...",
+  "Sistema instável..."
 ];
 
 let i = 0;
 
 document.getElementById("startBtn").onclick = () => {
-
   document.getElementById("startBtn").remove();
-  document.getElementById("boot").style.display = "flex";
+  document.getElementById("loading").style.display = "flex";
 
-  iniciarLogs();
+  playBootAudio();
+  loop();
 };
 
-function iniciarLogs() {
+/* 🔊 ÁUDIO SINCRONIZADO BOOT */
+function playBootAudio() {
+  setTimeout(() => document.getElementById("voice1").play().catch(()=>{}), 500);
+  setTimeout(() => document.getElementById("voice2").play().catch(()=>{}), 2000);
+}
+
+/* LOGS */
+function loop() {
 
   if (i < logs.length) {
 
@@ -173,66 +201,70 @@ function iniciarLogs() {
     p.innerText = logs[i];
     document.getElementById("logs").appendChild(p);
 
-    if (i === logs.length - 1) iniciarErro();
-
     i++;
-    setTimeout(iniciarLogs, 900);
 
+    setTimeout(loop, 900 + Math.random() * 800);
+
+  } else {
+    setTimeout(corromper, 1000);
   }
 }
 
-function iniciarErro() {
+/* 💀 CORRUPÇÃO DE SISTEMA */
+function corromper() {
 
-  document.getElementById("alert").style.top = "0";
+  document.body.classList.add("shake", "corrupt");
+
+  document.getElementById("notif").style.top = "0";
   document.getElementById("popup").style.bottom = "0";
-  document.getElementById("popup").innerHTML = "<b>CRITICAL FAILURE</b>";
+  document.getElementById("popup").innerHTML = "<b>SYSTEM CORRUPTION DETECTED</b>";
 
-  document.body.classList.add("glitch");
+  // 🔊 SIRENE
+  const s = document.getElementById("sirene");
+  s.currentTime = 0;
+  s.play().catch(()=>{});
 
-  // 🔊 SOM (só funciona no clique → agora garantido)
-  const sirene = document.getElementById("sirene");
-  sirene.currentTime = 0;
-  sirene.play().catch(()=>{});
-
-  // 📳 vibração REAL
+  // 📳 vibração forte
   if (navigator.vibrate) {
-    navigator.vibrate([200,100,200,100,500]);
+    navigator.vibrate([200,100,300,100,500,100,600]);
   }
 
-  setTimeout(iniciarVideo, 2200);
+  setTimeout(iniciarVideo, 2500);
 }
 
+/* 🎬 VÍDEO */
 function iniciarVideo() {
 
-  document.getElementById("boot").remove();
-  document.getElementById("alert").remove();
+  document.getElementById("loading").remove();
+  document.getElementById("notif").remove();
   document.getElementById("popup").remove();
 
-  const container = document.getElementById("videoContainer");
-  container.style.display = "block";
-
   const video = document.getElementById("video");
+  const final = document.getElementById("final");
 
-  video.play().catch(()=>{});
-
-  let acabou = false;
-
-  video.onended = () => {
-    acabou = true;
-    mostrarSenha();
-  };
+  final.style.display = "flex";
 
   setTimeout(() => {
-    if (!acabou) mostrarSenha();
-  }, 20000);
+    video.style.opacity = "1";
+    video.style.transform = "scale(1)";
+    video.play().catch(()=>{});
+  }, 300);
+
+  video.onended = mostrarSenha;
+
+  // fallback
+  setTimeout(mostrarSenha, 20000);
 }
 
+/* 🔑 SENHA */
 function mostrarSenha() {
 
-  document.getElementById("videoContainer").remove();
+  document.body.classList.remove("shake", "corrupt");
 
-  const box = document.getElementById("senhaBox");
-  box.style.display = "flex";
+  document.getElementById("video").style.display = "none";
+
+  document.getElementById("senhaBox").style.opacity = "1";
+  document.getElementById("senhaBox").style.transform = "translateY(0)";
 }
 
 </script>
