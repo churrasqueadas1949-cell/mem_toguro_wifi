@@ -112,7 +112,6 @@ button {
   color: white;
 }
 
-/* animação leve */
 @keyframes pop {
   0% { transform: scale(0.8); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
@@ -133,7 +132,7 @@ button {
 <div id="overlay"></div>
 
 <div id="videoBox">
-  <video id="video" playsinline>
+  <video id="video" playsinline muted>
     <source src="0416.mp4" type="video/mp4">
   </video>
 </div>
@@ -163,13 +162,30 @@ const logs = [
 
 let i = 0;
 
+/* 🔓 CORREÇÃO UNIVERSAL (iPhone) */
 document.getElementById("startBtn").onclick = () => {
+
+  const audios = [
+    document.getElementById("sirene"),
+    document.getElementById("errorSound"),
+    document.getElementById("failSound")
+  ];
+
+  audios.forEach(a => {
+    a.muted = true;
+    a.play().then(() => {
+      a.pause();
+      a.currentTime = 0;
+      a.muted = false;
+    }).catch(()=>{});
+  });
+
   document.getElementById("startBtn").remove();
   document.getElementById("loading").style.display = "flex";
   loop();
 };
 
-/* BOOT (CORRIGIDO: SEM ÁUDIO) */
+/* BOOT (SEM SOM) */
 function loop() {
   if (i < logs.length) {
 
@@ -185,12 +201,11 @@ function loop() {
   }
 }
 
-/* CAOS (INALTERADO) */
+/* CAOS */
 function startChaos() {
 
   document.getElementById("loading").remove();
   document.getElementById("notif").style.top = "0";
-  document.body.classList.add("glitch");
 
   const overlay = document.getElementById("overlay");
 
@@ -222,6 +237,7 @@ function startChaos() {
     if (j >= msgs.length) {
       setTimeout(() => {
         overlay.innerHTML = "";
+        document.getElementById("sirene").pause();
         startVideo();
       }, 1200);
       return;
@@ -254,15 +270,16 @@ function startChaos() {
 
     overlay.appendChild(box);
 
-   setTimeout(() => box.remove(), 450 + Math.random() * 250);
+    setTimeout(() => box.remove(), 450 + Math.random() * 250);
 
     if (j === 0) {
       document.getElementById("sirene").play().catch(()=>{});
     }
 
     if (j % 3 === 0) {
-      document.getElementById("errorSound").currentTime = 0;
-      document.getElementById("errorSound").play().catch(()=>{});
+      const err = document.getElementById("errorSound");
+      err.currentTime = 0;
+      err.play().catch(()=>{});
     }
 
     if (navigator.vibrate) {
@@ -289,7 +306,9 @@ function startVideo() {
 
   requestAnimationFrame(() => {
     video.style.opacity = "1";
-    video.play().catch(()=>{});
+    video.play().then(()=>{
+      video.muted = false;
+    }).catch(()=>{});
   });
 
   video.onended = showSenha;
